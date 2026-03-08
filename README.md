@@ -31,7 +31,7 @@ Notes are stored as plain Markdown files in `~/.local/share/nvim/project-notes/<
 
 ```lua
 {
-    "yourname/project-notes.nvim",
+    "michael-duren/project-notes.nvim",
     dependencies = {
         "nvim-telescope/telescope.nvim", -- optional
     },
@@ -43,7 +43,7 @@ Notes are stored as plain Markdown files in `~/.local/share/nvim/project-notes/<
 
 ```lua
 use {
-    "yourname/project-notes.nvim",
+    "michael-duren/project-notes.nvim",
     requires = {
         "nvim-telescope/telescope.nvim", -- optional
     },

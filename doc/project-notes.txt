@@ -1,6 +1,6 @@
 *project-notes.txt*  Per-project notes for Neovim
 
-Author: Your Name
+Author: Michael Duren
 License: MIT
 
 ==============================================================================
@@ -45,7 +45,7 @@ repository and version control.
 Using lazy.nvim: >lua
 
     {
-        "yourname/project-notes.nvim",
+        "michael-duren/project-notes.nvim",
         dependencies = {
             "nvim-telescope/telescope.nvim", -- optional
         },
@@ -56,7 +56,7 @@ Using lazy.nvim: >lua
 Using packer.nvim: >lua
 
     use {
-        "yourname/project-notes.nvim",
+        "michael-duren/project-notes.nvim",
         requires = {
             "nvim-telescope/telescope.nvim", -- optional
         },

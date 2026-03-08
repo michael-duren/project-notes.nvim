@@ -6,7 +6,7 @@ Thank you for your interest in contributing to Project Notes!
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourname/project-notes.nvim
+git clone https://github.com/michael-duren/project-notes.nvim
 cd project-notes.nvim
 ```
 
