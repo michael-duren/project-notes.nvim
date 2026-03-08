@@ -1,0 +1,246 @@
+*project-notes.txt*  Per-project notes for Neovim
+
+Author: Your Name
+License: MIT
+
+==============================================================================
+CONTENTS                                           *project-notes-contents*
+
+    1. Introduction ................ |project-notes-intro|
+    2. Requirements ................ |project-notes-requirements|
+    3. Installation ................ |project-notes-installation|
+    4. Configuration ............... |project-notes-config|
+    5. Commands .................... |project-notes-commands|
+    6. Functions ................... |project-notes-functions|
+    7. How It Works ................ |project-notes-how-it-works|
+
+==============================================================================
+1. INTRODUCTION                                       *project-notes-intro*
+
+Project Notes is a Neovim plugin for managing per-project notes. Notes are
+stored in your XDG data directory and automatically associated with Git
+repositories, so your notes follow your projects without cluttering your
+repos.
+
+The plugin identifies each project by hashing the Git remote origin URL from
+`.git/config`. This means your notes persist across clones, worktrees, and
+directory renames — as long as the remote is the same, your notes are found.
+For repos without a remote, it falls back to hashing the path of the `.git`
+directory.
+
+Notes are stored as plain Markdown files in
+`~/.local/share/nvim/project-notes/<hash>/`, keeping them out of your
+repository and version control.
+
+==============================================================================
+2. REQUIREMENTS                                 *project-notes-requirements*
+
+- Neovim >= 0.9.0
+- Git
+- (Optional) telescope.nvim for fuzzy finding notes
+
+==============================================================================
+3. INSTALLATION                                 *project-notes-installation*
+
+Using lazy.nvim: >lua
+
+    {
+        "yourname/project-notes.nvim",
+        dependencies = {
+            "nvim-telescope/telescope.nvim", -- optional
+        },
+        opts = {},
+    }
+<
+
+Using packer.nvim: >lua
+
+    use {
+        "yourname/project-notes.nvim",
+        requires = {
+            "nvim-telescope/telescope.nvim", -- optional
+        },
+        config = function()
+            require("project-notes").setup()
+        end,
+    }
+<
+
+==============================================================================
+4. CONFIGURATION                                     *project-notes-config*
+
+Project Notes can be configured by passing a table to the `setup()` function.
+
+Example with all defaults: >lua
+
+    require("project-notes").setup({
+        -- Directory where notes are stored
+        data_dir = vim.fn.stdpath("data") .. "/project-notes",
+
+        -- Default file extension for new notes
+        ext = ".md",
+
+        -- Floating window dimensions (0.0 - 1.0 = percentage of editor)
+        window = {
+            width = 0.6,
+            height = 0.7,
+            border = "rounded",
+        },
+
+        -- Sort order for note list: "created", "modified", "title"
+        sort_by = "modified",
+
+        -- Key mappings inside the notes browser
+        mappings = {
+            new_note = "n",
+            delete_note = "d",
+            edit_note = "<CR>",
+            close = "q",
+        },
+    })
+<
+
+                                                  *project-notes-config.data_dir*
+data_dir ~
+    Type: `string`
+    Default: `vim.fn.stdpath("data") .. "/project-notes"`
+
+    Directory where project notes are stored.
+
+                                                      *project-notes-config.ext*
+ext ~
+    Type: `string`
+    Default: `".md"`
+
+    File extension for new notes.
+
+                                                   *project-notes-config.window*
+window ~
+    Type: `table`
+
+    Floating window configuration for the notes browser.
+
+    - width: Width as percentage of editor (0.0 - 1.0)
+    - height: Height as percentage of editor (0.0 - 1.0)
+    - border: Border style ("none", "single", "double", "rounded", etc.)
+
+                                                  *project-notes-config.sort_by*
+sort_by ~
+    Type: `string`
+    Default: `"modified"`
+
+    Sort order for notes list. Valid values:
+    - "created": Sort by creation time (newest first)
+    - "modified": Sort by last modification time (newest first)
+    - "title": Sort alphabetically by title
+
+                                                 *project-notes-config.mappings*
+mappings ~
+    Type: `table`
+
+    Key mappings for the notes browser.
+
+    - new_note: Create a new note
+    - delete_note: Delete the note under cursor
+    - edit_note: Open the note under cursor for editing
+    - close: Close the browser window
+
+==============================================================================
+5. COMMANDS                                         *project-notes-commands*
+
+:ProjectNotes                                               *:ProjectNotes*
+    Open the notes browser for the current project.
+
+:ProjectNotesNew                                         *:ProjectNotesNew*
+    Create a new note for the current project. You will be prompted for a
+    title.
+
+:ProjectNotesFind                                       *:ProjectNotesFind*
+    Fuzzy find notes using Telescope. Requires telescope.nvim.
+
+==============================================================================
+6. FUNCTIONS                                       *project-notes-functions*
+
+                                                  *project-notes.setup()*
+setup({opts})
+    Configure the plugin. See |project-notes-config| for available options.
+
+    Parameters: ~
+        {opts} (table|nil) Configuration options
+
+                                          *project-notes.ui.open_browser()*
+ui.open_browser()
+    Open the notes browser floating window.
+
+                                           *project-notes.notes.create_note()*
+notes.create_note()
+    Create a new note. Prompts for a title and opens the new note in a
+    buffer.
+
+                                             *project-notes.notes.get_notes()*
+notes.get_notes()
+    Get all notes for the current project.
+
+    Returns: ~
+        (table) List of note objects, each containing:
+            - path: Full path to the note file
+            - filename: Filename of the note
+            - title: Note title
+            - created: Creation timestamp
+            - modified: Last modification timestamp
+
+                                           *project-notes.notes.delete_note()*
+notes.delete_note({note})
+    Delete a note with confirmation prompt.
+
+    Parameters: ~
+        {note} (table) Note object from get_notes()
+
+                                             *project-notes.notes.edit_note()*
+notes.edit_note({note})
+    Open a note in a buffer for editing.
+
+    Parameters: ~
+        {note} (table) Note object from get_notes()
+
+                                       *project-notes.telescope.find_notes()*
+telescope.find_notes()
+    Open Telescope picker for fuzzy finding notes.
+
+==============================================================================
+7. HOW IT WORKS                                  *project-notes-how-it-works*
+
+1. When invoked, the plugin walks up from the current buffer's directory to
+   find the nearest `.git` directory
+
+2. It reads `.git/config` and extracts the `remote "origin"` URL
+
+3. The URL is hashed with SHA-256 to produce a stable project identifier
+
+4. If no remote exists, the absolute path of the `.git` directory is hashed
+   instead
+
+5. Notes are stored as individual Markdown files under
+   `~/.local/share/nvim/project-notes/<hash>/`
+
+This approach means:
+- Cloning the same repo to a different path still finds your notes
+- Multiple worktrees of the same repo share notes
+- Local-only repos (no remote) still get their own note space
+- Notes never pollute your repository or show up in `git status`
+
+File Structure: ~
+
+    ~/.local/share/nvim/project-notes/
+    └── a1b2c3d4e5f6.../
+        ├── meta.json            # project metadata (name, remote URL)
+        ├── 1710000000_setup.md
+        ├── 1710100000_todo.md
+        └── 1710200000_arch.md
+
+Each note filename is prefixed with a Unix timestamp of creation for natural
+ordering. `meta.json` stores the project name and remote URL for display
+purposes.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
