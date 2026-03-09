@@ -15,6 +15,9 @@ M.config = {
     edit_note = "<CR>",
     close = "q",
   },
+  -- Picker preference: "auto", "snacks", "telescope"
+  -- "auto" will use snacks if available, otherwise telescope
+  picker = "auto",
 }
 
 function M.setup(opts)
@@ -33,7 +36,7 @@ function M.setup(opts)
   end, {})
 
   vim.api.nvim_create_user_command("ProjectNotesFind", function()
-    require("project-notes.telescope").find_notes()
+    require("project-notes.picker").find_notes()
   end, {})
 end
 

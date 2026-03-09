@@ -5,33 +5,54 @@ local config = require("project-notes").config
 local buf, win
 local current_notes = {}
 
--- Create centered floating window
+-- Create centered floating window using Snacks if available, otherwise vanilla Neovim
 local function create_floating_window()
-  local width = math.floor(vim.o.columns * config.window.width)
-  local height = math.floor(vim.o.lines * config.window.height)
-  local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.floor((vim.o.columns - width) / 2)
+  local has_snacks, snacks = pcall(require, "snacks")
 
   -- Create buffer
   buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
   vim.api.nvim_buf_set_option(buf, "filetype", "markdown")
 
-  -- Create window
-  local opts = {
-    relative = "editor",
-    width = width,
-    height = height,
-    row = row,
-    col = col,
-    style = "minimal",
-    border = config.window.border,
-  }
+  if has_snacks and snacks.win then
+    -- Use Snacks.nvim for enhanced window management
+    local snacks_win = snacks.win({
+      buf = buf,
+      relative = "editor",
+      width = config.window.width,
+      height = config.window.height,
+      border = config.window.border,
+      title = " Project Notes ",
+      title_pos = "center",
+      wo = {
+        wrap = true,
+        linebreak = true,
+        cursorline = true,
+      },
+    })
+    win = snacks_win.win
+  else
+    -- Fallback to vanilla Neovim floating window
+    local width = math.floor(vim.o.columns * config.window.width)
+    local height = math.floor(vim.o.lines * config.window.height)
+    local row = math.floor((vim.o.lines - height) / 2)
+    local col = math.floor((vim.o.columns - width) / 2)
 
-  win = vim.api.nvim_open_win(buf, true, opts)
-  vim.api.nvim_win_set_option(win, "wrap", true)
-  vim.api.nvim_win_set_option(win, "linebreak", true)
-  vim.api.nvim_win_set_option(win, "cursorline", true)
+    local opts = {
+      relative = "editor",
+      width = width,
+      height = height,
+      row = row,
+      col = col,
+      style = "minimal",
+      border = config.window.border,
+    }
+
+    win = vim.api.nvim_open_win(buf, true, opts)
+    vim.api.nvim_win_set_option(win, "wrap", true)
+    vim.api.nvim_win_set_option(win, "linebreak", true)
+    vim.api.nvim_win_set_option(win, "cursorline", true)
+  end
 
   return buf, win
 end

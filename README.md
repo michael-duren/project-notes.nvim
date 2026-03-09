@@ -16,14 +16,16 @@ Notes are stored as plain Markdown files in `~/.local/share/nvim/project-notes/<
 - **Edit notes** — open any note in a buffer for editing
 - **Delete notes** — remove notes you no longer need
 - **Timestamps** — notes are automatically timestamped on creation and last edit
-- **Telescope integration** — fuzzy find across all notes in the current project
+- **Snacks.nvim integration** — enhanced floating windows and fuzzy finding
+- **Telescope integration** — alternative fuzzy finder support
 - **Markdown preview** — notes are rendered as Markdown in the floating window
 
 ## Requirements
 
 - Neovim >= 0.9.0
 - Git
-- (Optional) [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) for fuzzy finding notes
+- (Optional) [snacks.nvim](https://github.com/folke/snacks.nvim) for enhanced UI and fuzzy finding
+- (Optional) [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) as alternative fuzzy finder
 
 ## Installation
 
@@ -33,7 +35,9 @@ Notes are stored as plain Markdown files in `~/.local/share/nvim/project-notes/<
 {
     "michael-duren/project-notes.nvim",
     dependencies = {
-        "nvim-telescope/telescope.nvim", -- optional
+        "folke/snacks.nvim", -- optional, for enhanced UI
+        -- OR
+        "nvim-telescope/telescope.nvim", -- optional, alternative picker
     },
     opts = {},
 }
@@ -45,7 +49,9 @@ Notes are stored as plain Markdown files in `~/.local/share/nvim/project-notes/<
 use {
     "michael-duren/project-notes.nvim",
     requires = {
-        "nvim-telescope/telescope.nvim", -- optional
+        "folke/snacks.nvim", -- optional, for enhanced UI
+        -- OR
+        "nvim-telescope/telescope.nvim", -- optional, alternative picker
     },
     config = function()
         require("project-notes").setup()
@@ -74,6 +80,10 @@ require("project-notes").setup({
     -- Sort order for note list: "created", "modified", "title"
     sort_by = "modified",
 
+    -- Picker preference: "auto", "snacks", "telescope"
+    -- "auto" will use snacks if available, otherwise telescope
+    picker = "auto",
+
     -- Key mappings inside the notes browser
     mappings = {
         new_note = "n",
@@ -92,7 +102,7 @@ require("project-notes").setup({
 |---|---|
 | `:ProjectNotes` | Open the notes browser for the current project |
 | `:ProjectNotesNew` | Create a new note |
-| `:ProjectNotesFind` | Fuzzy find notes with Telescope |
+| `:ProjectNotesFind` | Fuzzy find notes (uses Snacks or Telescope) |
 
 ### Keymaps
 

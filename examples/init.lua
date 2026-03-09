@@ -18,6 +18,10 @@ require("project-notes").setup({
   -- Sort by creation date instead of modified date
   sort_by = "created",
 
+  -- Picker preference: "auto" (default), "snacks", or "telescope"
+  -- "auto" will use snacks if available, otherwise telescope
+  picker = "auto",
+
   -- Custom keymaps
   mappings = {
     new_note = "a",        -- 'a' for add
